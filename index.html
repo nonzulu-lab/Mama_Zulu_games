@@ -1,0 +1,821 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>IsiZulu Farm Food Games</title>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      background: #f4f7f4;
+      color: #222;
+      text-align: center;
+    }
+
+    header {
+      background: #2e7d32;
+      color: white;
+      padding: 18px;
+    }
+
+    h1, h2, h3 {
+      margin: 10px 0;
+    }
+
+    .container {
+      padding: 20px;
+      max-width: 1200px;
+      margin: auto;
+    }
+
+    .tabs {
+      display: flex;
+      justify-content: center;
+      gap: 10px;
+      flex-wrap: wrap;
+      margin-bottom: 20px;
+    }
+
+    .tab-btn {
+      padding: 10px 16px;
+      border: none;
+      border-radius: 8px;
+      background: #1565c0;
+      color: white;
+      cursor: pointer;
+      font-size: 15px;
+    }
+
+    .tab-btn:hover {
+      background: #0d47a1;
+    }
+
+    .game-section {
+      display: none;
+      background: white;
+      border-radius: 12px;
+      padding: 20px;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      margin-bottom: 20px;
+    }
+
+    .game-section.active {
+      display: block;
+    }
+
+    button {
+      padding: 10px 14px;
+      border: none;
+      border-radius: 8px;
+      background: #1565c0;
+      color: white;
+      cursor: pointer;
+      margin: 5px;
+      font-size: 14px;
+    }
+
+    button:hover {
+      background: #0d47a1;
+    }
+
+    .status {
+      font-weight: bold;
+      margin: 10px 0;
+    }
+
+    /* WORD SEARCH */
+    .word-layout {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 20px;
+      justify-content: center;
+      align-items: flex-start;
+    }
+
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(15, 34px);
+      gap: 4px;
+      justify-content: center;
+      margin-top: 10px;
+    }
+
+    .cell {
+      width: 34px;
+      height: 34px;
+      line-height: 34px;
+      border: 1px solid #999;
+      background: white;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      border-radius: 6px;
+      font-size: 14px;
+    }
+
+    .cell.selected {
+      background: #ffe082;
+    }
+
+    .cell.found {
+      background: #66bb6a;
+      color: white;
+      border-color: #2e7d32;
+    }
+
+    .word-list {
+      text-align: left;
+      max-width: 260px;
+      margin: 0 auto;
+      padding-left: 20px;
+    }
+
+    .word-list li {
+      margin: 8px 0;
+    }
+
+    .word-list li.done {
+      text-decoration: line-through;
+      color: #2e7d32;
+      font-weight: bold;
+    }
+
+    /* MEMORY */
+    .memory-grid {
+      display: grid;
+      grid-template-columns: repeat(4, 120px);
+      gap: 12px;
+      justify-content: center;
+      margin-top: 20px;
+    }
+
+    .memory-card {
+      height: 80px;
+      border-radius: 10px;
+      background: #1976d2;
+      color: white;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 8px;
+      font-weight: bold;
+      cursor: pointer;
+      user-select: none;
+      border: 2px solid transparent;
+      font-size: 14px;
+      text-align: center;
+    }
+
+    .memory-card.flipped,
+    .memory-card.matched {
+      background: #fff;
+      color: #222;
+      border-color: #1976d2;
+    }
+
+    .memory-card.matched {
+      background: #c8e6c9;
+      border-color: #2e7d32;
+    }
+
+    /* HANGMAN */
+    .hangman-box {
+      max-width: 800px;
+      margin: auto;
+    }
+
+    .hangman-word {
+      display: flex;
+      justify-content: center;
+      flex-wrap: wrap;
+      gap: 8px;
+      margin: 20px 0;
+    }
+
+    .letter-box {
+      width: 36px;
+      height: 44px;
+      line-height: 44px;
+      border-bottom: 3px solid #333;
+      font-size: 24px;
+      font-weight: bold;
+      text-transform: uppercase;
+    }
+
+    .keyboard {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      max-width: 700px;
+      margin: 20px auto;
+    }
+
+    .key-btn {
+      width: 42px;
+      height: 42px;
+      padding: 0;
+      font-weight: bold;
+    }
+
+    .hangman-info {
+      font-size: 16px;
+      margin-top: 12px;
+    }
+
+    .clue {
+      background: #fff8dc;
+      border: 1px solid #e0c97f;
+      padding: 10px;
+      border-radius: 10px;
+      margin: 12px auto;
+      max-width: 500px;
+    }
+
+    /* PICTURE QUIZ */
+    .quiz-box {
+      max-width: 650px;
+      margin: auto;
+    }
+
+    .quiz-picture {
+      font-size: 90px;
+      margin: 20px 0;
+    }
+
+    .quiz-options {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(180px, 1fr));
+      gap: 12px;
+      max-width: 500px;
+      margin: 20px auto;
+    }
+
+    .quiz-option {
+      background: #1565c0;
+      color: white;
+      border: none;
+      border-radius: 10px;
+      padding: 14px;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    .quiz-option:hover {
+      background: #0d47a1;
+    }
+
+    .quiz-feedback {
+      font-weight: bold;
+      margin-top: 10px;
+      min-height: 24px;
+    }
+
+    .quiz-score {
+      margin-top: 10px;
+      font-size: 16px;
+      font-weight: bold;
+    }
+
+    @media (max-width: 700px) {
+      .grid {
+        grid-template-columns: repeat(15, 24px);
+        gap: 3px;
+      }
+
+      .cell {
+        width: 24px;
+        height: 24px;
+        line-height: 24px;
+        font-size: 11px;
+      }
+
+      .memory-grid {
+        grid-template-columns: repeat(2, 140px);
+      }
+
+      .quiz-options {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>IsiZulu Farm Food Games</h1>
+    <p>Ukudla kwasepulazini</p>
+  </header>
+
+  <div class="container">
+    <div class="tabs">
+      <button class="tab-btn" onclick="showGame('wordsearch')">Word Search</button>
+      <button class="tab-btn" onclick="showGame('memory')">Memory Game</button>
+      <button class="tab-btn" onclick="showGame('hangman')">Hangman</button>
+      <button class="tab-btn" onclick="showGame('picturequiz')">Picture Quiz</button>
+    </div>
+
+    <!-- WORD SEARCH -->
+    <section id="wordsearch" class="game-section active">
+      <h2>Word Search</h2>
+      <p>Click the letters of one word, then click <strong>Check Word</strong>.</p>
+
+      <div class="word-layout">
+        <div>
+          <div id="wordGrid" class="grid"></div>
+          <div>
+            <button onclick="checkWordSelection()">Check Word</button>
+            <button onclick="clearWordSelection()">Clear Selection</button>
+            <button onclick="buildWordSearch()">New Puzzle</button>
+          </div>
+          <div class="status" id="wordStatus">Find all the hidden words.</div>
+        </div>
+
+        <div>
+          <h3>Words to Find</h3>
+          <ul id="wordList" class="word-list"></ul>
+        </div>
+      </div>
+    </section>
+
+    <!-- MEMORY -->
+    <section id="memory" class="game-section">
+      <h2>Memory Game</h2>
+      <p>Match the isiZulu word with the English meaning.</p>
+      <div>
+        <button onclick="startMemoryGame()">New Memory Game</button>
+      </div>
+      <div class="status" id="memoryStatus">Find all matching pairs.</div>
+      <div id="memoryGrid" class="memory-grid"></div>
+    </section>
+
+    <!-- HANGMAN -->
+    <section id="hangman" class="game-section">
+      <h2>Hangman</h2>
+      <div class="hangman-box">
+        <div class="clue" id="hangmanClue"></div>
+        <div id="hangmanWord" class="hangman-word"></div>
+        <div class="hangman-info" id="hangmanInfo">Wrong guesses left: 6</div>
+        <div id="hangmanKeyboard" class="keyboard"></div>
+        <div>
+          <button onclick="startHangman()">New Hangman Word</button>
+        </div>
+      </div>
+    </section>
+
+    <!-- PICTURE QUIZ -->
+    <section id="picturequiz" class="game-section">
+      <h2>Picture Quiz</h2>
+      <p>Choose the correct isiZulu word for the picture.</p>
+
+      <div class="quiz-box">
+        <div id="quizPicture" class="quiz-picture">🥛</div>
+        <div id="quizQuestion"><strong>What is this in isiZulu?</strong></div>
+        <div id="quizOptions" class="quiz-options"></div>
+        <div id="quizFeedback" class="quiz-feedback"></div>
+        <div id="quizScore" class="quiz-score">Score: 0 / 0</div>
+        <div>
+          <button onclick="nextQuizQuestion()">Next Question</button>
+          <button onclick="startPictureQuiz()">Restart Quiz</button>
+        </div>
+      </div>
+    </section>
+  </div>
+
+  <script>
+    const vocabulary = [
+      { zulu: "UBISI", english: "milk", picture: "🥛" },
+      { zulu: "INYAMA", english: "meat", picture: "🥩" },
+      { zulu: "UTAMATISI", english: "tomato", picture: "🍅" },
+      { zulu: "UBHANANA", english: "banana", picture: "🍌" },
+      { zulu: "UBHONTSHISI", english: "beans", picture: "🫘" },
+      { zulu: "ISIPINASHI", english: "spinach", picture: "🥬" },
+      { zulu: "ITHANGA", english: "pumpkin", picture: "🎃" },
+      { zulu: "UKHEROTHI", english: "carrot", picture: "🥕" },
+      { zulu: "IAPHULA", english: "apple", picture: "🍎" },
+      { zulu: "IPHEYA", english: "pear", picture: "🍐" },
+      { zulu: "IWOLINTSHI", english: "orange", picture: "🍊" },
+      { zulu: "AMAGILEBHISI", english: "grapes", picture: "🍇" },
+      { zulu: "IKLABISHI", english: "cabbage", picture: "🥬" }
+    ];
+
+    function showGame(id) {
+      document.querySelectorAll(".game-section").forEach(sec => sec.classList.remove("active"));
+      document.getElementById(id).classList.add("active");
+    }
+
+    /* ---------------- WORD SEARCH ---------------- */
+    const wsSize = 15;
+    const wsDirections = [
+      { dr: 0, dc: 1 },
+      { dr: 1, dc: 0 },
+      { dr: 1, dc: 1 },
+      { dr: -1, dc: 1 }
+    ];
+
+    let wsGrid = [];
+    let wsPlacements = [];
+    let wsSelected = [];
+    let wsFound = new Set();
+
+    function makeEmptyGrid() {
+      return Array.from({ length: wsSize }, () => Array(wsSize).fill(""));
+    }
+
+    function randomLetter() {
+      const letters = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
+      return letters[Math.floor(Math.random() * letters.length)];
+    }
+
+    function canPlaceWord(word, row, col, dr, dc) {
+      for (let i = 0; i < word.length; i++) {
+        const r = row + i * dr;
+        const c = col + i * dc;
+        if (r < 0 || r >= wsSize || c < 0 || c >= wsSize) return false;
+        if (wsGrid[r][c] !== "" && wsGrid[r][c] !== word[i]) return false;
+      }
+      return true;
+    }
+
+    function placeOneWord(wordObj) {
+      for (let tries = 0; tries < 300; tries++) {
+        const dir = wsDirections[Math.floor(Math.random() * wsDirections.length)];
+        const row = Math.floor(Math.random() * wsSize);
+        const col = Math.floor(Math.random() * wsSize);
+
+        if (canPlaceWord(wordObj.zulu, row, col, dir.dr, dir.dc)) {
+          const coords = [];
+          for (let i = 0; i < wordObj.zulu.length; i++) {
+            const r = row + i * dir.dr;
+            const c = col + i * dir.dc;
+            wsGrid[r][c] = wordObj.zulu[i];
+            coords.push(`${r}-${c}`);
+          }
+          wsPlacements.push({ word: wordObj.zulu, coords });
+          return true;
+        }
+      }
+      return false;
+    }
+
+    function renderWordGrid() {
+      const gridEl = document.getElementById("wordGrid");
+      gridEl.innerHTML = "";
+
+      for (let r = 0; r < wsSize; r++) {
+        for (let c = 0; c < wsSize; c++) {
+          const cell = document.createElement("div");
+          cell.className = "cell";
+          cell.textContent = wsGrid[r][c];
+          cell.dataset.key = `${r}-${c}`;
+          cell.addEventListener("click", () => toggleWordCell(cell));
+          gridEl.appendChild(cell);
+        }
+      }
+    }
+
+    function renderWordList() {
+      const list = document.getElementById("wordList");
+      list.innerHTML = "";
+      vocabulary.forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item.zulu;
+        if (wsFound.has(item.zulu)) li.classList.add("done");
+        list.appendChild(li);
+      });
+    }
+
+    function toggleWordCell(cell) {
+      if (cell.classList.contains("found")) return;
+      const key = cell.dataset.key;
+
+      if (cell.classList.contains("selected")) {
+        cell.classList.remove("selected");
+        wsSelected = wsSelected.filter(k => k !== key);
+      } else {
+        cell.classList.add("selected");
+        wsSelected.push(key);
+      }
+    }
+
+    function clearWordSelection() {
+      document.querySelectorAll("#wordGrid .cell.selected").forEach(cell => {
+        cell.classList.remove("selected");
+      });
+      wsSelected = [];
+      document.getElementById("wordStatus").textContent = "Selection cleared.";
+    }
+
+    function sameCoords(a, b) {
+      if (a.length !== b.length) return false;
+      const x = [...a].sort();
+      const y = [...b].sort();
+      return x.every((val, i) => val === y[i]);
+    }
+
+    function checkWordSelection() {
+      if (wsSelected.length === 0) {
+        document.getElementById("wordStatus").textContent = "Select a word first.";
+        return;
+      }
+
+      let matched = null;
+      for (const placement of wsPlacements) {
+        if (!wsFound.has(placement.word) && sameCoords(wsSelected, placement.coords)) {
+          matched = placement;
+          break;
+        }
+      }
+
+      if (matched) {
+        wsFound.add(matched.word);
+        matched.coords.forEach(key => {
+          const cell = document.querySelector(`#wordGrid .cell[data-key="${key}"]`);
+          if (cell) {
+            cell.classList.remove("selected");
+            cell.classList.add("found");
+          }
+        });
+        wsSelected = [];
+        renderWordList();
+
+        if (wsFound.size === vocabulary.length) {
+          document.getElementById("wordStatus").textContent = "Excellent! You found all the words.";
+        } else {
+          document.getElementById("wordStatus").textContent = `Correct! You found ${matched.word}.`;
+        }
+      } else {
+        document.getElementById("wordStatus").textContent = "That is not one of the hidden words. Try again.";
+      }
+    }
+
+    function buildWordSearch() {
+      wsGrid = makeEmptyGrid();
+      wsPlacements = [];
+      wsSelected = [];
+      wsFound = new Set();
+
+      const sortedWords = [...vocabulary].sort((a, b) => b.zulu.length - a.zulu.length);
+
+      for (const item of sortedWords) {
+        const placed = placeOneWord(item);
+        if (!placed) {
+          return buildWordSearch();
+        }
+      }
+
+      for (let r = 0; r < wsSize; r++) {
+        for (let c = 0; c < wsSize; c++) {
+          if (wsGrid[r][c] === "") wsGrid[r][c] = randomLetter();
+        }
+      }
+
+      renderWordGrid();
+      renderWordList();
+      document.getElementById("wordStatus").textContent = "Find all the hidden words.";
+    }
+
+    /* ---------------- MEMORY GAME ---------------- */
+    let memoryCards = [];
+    let flippedCards = [];
+    let matchedPairs = 0;
+    let lockBoard = false;
+
+    function shuffle(array) {
+      return array.sort(() => Math.random() - 0.5);
+    }
+
+    function startMemoryGame() {
+      const chosen = vocabulary.slice(0, 8);
+      memoryCards = [];
+
+      chosen.forEach((item, index) => {
+        memoryCards.push({ id: index, type: "zulu", text: item.zulu, pairId: index });
+        memoryCards.push({ id: index + 100, type: "english", text: item.english.toUpperCase(), pairId: index });
+      });
+
+      shuffle(memoryCards);
+      flippedCards = [];
+      matchedPairs = 0;
+      lockBoard = false;
+
+      const grid = document.getElementById("memoryGrid");
+      grid.innerHTML = "";
+
+      memoryCards.forEach((card, idx) => {
+        const div = document.createElement("div");
+        div.className = "memory-card";
+        div.dataset.index = idx;
+        div.textContent = "?";
+        div.addEventListener("click", () => flipCard(div, idx));
+        grid.appendChild(div);
+      });
+
+      document.getElementById("memoryStatus").textContent = "Find all matching pairs.";
+    }
+
+    function flipCard(cardEl, index) {
+      if (lockBoard) return;
+      if (cardEl.classList.contains("flipped") || cardEl.classList.contains("matched")) return;
+      if (flippedCards.length === 2) return;
+
+      cardEl.classList.add("flipped");
+      cardEl.textContent = memoryCards[index].text;
+      flippedCards.push({ el: cardEl, index });
+
+      if (flippedCards.length === 2) {
+        const first = flippedCards[0];
+        const second = flippedCards[1];
+
+        if (
+          memoryCards[first.index].pairId === memoryCards[second.index].pairId &&
+          memoryCards[first.index].type !== memoryCards[second.index].type
+        ) {
+          first.el.classList.add("matched");
+          second.el.classList.add("matched");
+          first.el.classList.remove("flipped");
+          second.el.classList.remove("flipped");
+          flippedCards = [];
+          matchedPairs++;
+
+          if (matchedPairs === 8) {
+            document.getElementById("memoryStatus").textContent = "Excellent! You matched all pairs.";
+          } else {
+            document.getElementById("memoryStatus").textContent = "Good! That is a correct pair.";
+          }
+        } else {
+          lockBoard = true;
+          setTimeout(() => {
+            first.el.classList.remove("flipped");
+            second.el.classList.remove("flipped");
+            first.el.textContent = "?";
+            second.el.textContent = "?";
+            flippedCards = [];
+            lockBoard = false;
+            document.getElementById("memoryStatus").textContent = "Try again.";
+          }, 900);
+        }
+      }
+    }
+
+    /* ---------------- HANGMAN ---------------- */
+    const alphabet = "ABCDEFGHIJKLMNOPQRSTUVWXYZ".split("");
+    let hangmanWord = "";
+    let hangmanEnglish = "";
+    let guessedLetters = [];
+    let wrongGuesses = 0;
+    let maxWrong = 6;
+
+    function startHangman() {
+      const pick = vocabulary[Math.floor(Math.random() * vocabulary.length)];
+      hangmanWord = pick.zulu;
+      hangmanEnglish = pick.english;
+      guessedLetters = [];
+      wrongGuesses = 0;
+
+      renderHangmanWord();
+      renderKeyboard();
+      document.getElementById("hangmanClue").textContent = `Clue: ${hangmanEnglish}`;
+      document.getElementById("hangmanInfo").textContent = `Wrong guesses left: ${maxWrong - wrongGuesses}`;
+    }
+
+    function renderHangmanWord() {
+      const wordEl = document.getElementById("hangmanWord");
+      wordEl.innerHTML = "";
+
+      hangmanWord.split("").forEach(letter => {
+        const div = document.createElement("div");
+        div.className = "letter-box";
+        div.textContent = guessedLetters.includes(letter) ? letter : "";
+        wordEl.appendChild(div);
+      });
+    }
+
+    function renderKeyboard() {
+      const keyboard = document.getElementById("hangmanKeyboard");
+      keyboard.innerHTML = "";
+
+      alphabet.forEach(letter => {
+        const btn = document.createElement("button");
+        btn.className = "key-btn";
+        btn.textContent = letter;
+        btn.disabled = guessedLetters.includes(letter);
+        btn.onclick = () => guessLetter(letter, btn);
+        keyboard.appendChild(btn);
+      });
+    }
+
+    function guessLetter(letter, btn) {
+      btn.disabled = true;
+
+      if (!guessedLetters.includes(letter)) {
+        guessedLetters.push(letter);
+      }
+
+      if (!hangmanWord.includes(letter)) {
+        wrongGuesses++;
+      }
+
+      renderHangmanWord();
+
+      const allFound = hangmanWord.split("").every(letter => guessedLetters.includes(letter));
+
+      if (allFound) {
+        document.getElementById("hangmanInfo").textContent = `Excellent! You found the word: ${hangmanWord}`;
+        disableKeyboard();
+      } else if (wrongGuesses >= maxWrong) {
+        document.getElementById("hangmanInfo").textContent = `Game over. The word was ${hangmanWord}`;
+        revealHangmanWord();
+        disableKeyboard();
+      } else {
+        document.getElementById("hangmanInfo").textContent = `Wrong guesses left: ${maxWrong - wrongGuesses}`;
+      }
+    }
+
+    function disableKeyboard() {
+      document.querySelectorAll("#hangmanKeyboard button").forEach(btn => btn.disabled = true);
+    }
+
+    function revealHangmanWord() {
+      guessedLetters = [...new Set(hangmanWord.split(""))];
+      renderHangmanWord();
+    }
+
+    /* ---------------- PICTURE QUIZ ---------------- */
+    let quizCurrent = null;
+    let quizScore = 0;
+    let quizTotal = 0;
+
+    function getRandomItems(arr, count, excludeIndex = -1) {
+      const pool = arr
+        .map((item, index) => ({ item, index }))
+        .filter(x => x.index !== excludeIndex);
+
+      shuffle(pool);
+      return pool.slice(0, count).map(x => x.item);
+    }
+
+    function startPictureQuiz() {
+      quizScore = 0;
+      quizTotal = 0;
+      document.getElementById("quizFeedback").textContent = "";
+      updateQuizScore();
+      nextQuizQuestion();
+    }
+
+    function nextQuizQuestion() {
+      const correctIndex = Math.floor(Math.random() * vocabulary.length);
+      const correctItem = vocabulary[correctIndex];
+      const wrongItems = getRandomItems(vocabulary, 3, correctIndex);
+
+      let options = [correctItem, ...wrongItems];
+      options = shuffle(options);
+
+      quizCurrent = correctItem;
+
+      document.getElementById("quizPicture").textContent = correctItem.picture;
+      document.getElementById("quizQuestion").innerHTML = "<strong>What is this in isiZulu?</strong>";
+      document.getElementById("quizFeedback").textContent = "";
+
+      const optionsBox = document.getElementById("quizOptions");
+      optionsBox.innerHTML = "";
+
+      options.forEach(option => {
+        const btn = document.createElement("button");
+        btn.className = "quiz-option";
+        btn.textContent = option.zulu;
+        btn.onclick = () => checkQuizAnswer(option.zulu);
+        optionsBox.appendChild(btn);
+      });
+    }
+
+    function checkQuizAnswer(selectedWord) {
+      const feedback = document.getElementById("quizFeedback");
+      quizTotal++;
+
+      if (selectedWord === quizCurrent.zulu) {
+        quizScore++;
+        feedback.textContent = "Correct!";
+        feedback.style.color = "#2e7d32";
+      } else {
+        feedback.textContent = `Wrong. Correct answer: ${quizCurrent.zulu}`;
+        feedback.style.color = "#c62828";
+      }
+
+      updateQuizScore();
+      document.querySelectorAll(".quiz-option").forEach(btn => btn.disabled = true);
+    }
+
+    function updateQuizScore() {
+      document.getElementById("quizScore").textContent = `Score: ${quizScore} / ${quizTotal}`;
+    }
+
+    /* ---------------- START ---------------- */
+    buildWordSearch();
+    startMemoryGame();
+    startHangman();
+    startPictureQuiz();
+  </script>
+</body>
+</html>
